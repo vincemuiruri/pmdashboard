@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import pymysql
+import os
 pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,14 +29,14 @@ SECRET_KEY = 'django-insecure-u3=x1a+cw$cj6nfdx-(alvjotd$p59l!ca#7lalngt-j48ksm!
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "192.168.137.1",
-    "192.168.70.233"
+    "127.0.0.1",
 ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,6 +57,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'pmdash.urls'
 
 TEMPLATES = [
@@ -90,7 +93,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'pmdashboard',  # The database name (from the URL)
         'USER': 'root',   # The username (from the URL)
-        'PASSWORD': '2000',  # The password (from the URL)
+        'PASSWORD': 'mckenzie007',  # The password (from the URL)
         'HOST': 'localhost',  # The host (from the URL)
         'PORT': '3306',  # The port (from the URL)
         # 'OPTIONS': {
@@ -135,6 +138,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static/"),]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
