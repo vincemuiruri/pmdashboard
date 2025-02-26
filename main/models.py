@@ -8,11 +8,19 @@ class Project(models.Model):
     projectID = models.CharField(max_length=30, blank=False, null=False, unique=True)
     name = models.CharField(max_length=50, blank=False, null=False)
     deadline = models.DateField(blank=False, null=False)
-    progress = models.CharField(max_length=10,blank=False, null=False, default=0)
+    progress = models.CharField(max_length=10, blank=False, null=False, default="0")
     status = models.CharField(max_length=20, null=False, blank=False, default="ongoing")
 
     def __str__(self) -> str:
         return f"{self.name}"
+    
+class ProjectPhase(models.Model):
+    project = models.ForeignKey(Project, related_name="phases", on_delete=models.CASCADE)
+    phase_number = models.IntegerField(blank=False, null=False)
+    name = models.CharField(max_length=255, blank=False, null=False)
+
+    def __str__(self) -> str:
+        return f"{self.project.name} - {self.name}"
 
 class Contractor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_contractor", null=False, blank=False, unique=True)
@@ -26,13 +34,14 @@ class Contractor(models.Model):
 
 
 class ProjectProgress(models.Model):
-    project = models.ForeignKey(Project, related_name="project_phase", blank=False, null=False, on_delete=models.CASCADE)
-    phase = models.CharField(max_length=255, null=False, blank=False)
-    date = models.DateTimeField(null=False, blank=False, default=datetime.now())
+    project = models.ForeignKey(Project, related_name="project_progress", on_delete=models.CASCADE)
+    phase = models.ForeignKey(ProjectPhase, related_name="progress_phase", on_delete=models.CASCADE)
+    date = models.DateTimeField(null=False, blank=False, default=datetime.now)
     comment = models.TextField()
+    image = models.ImageField(upload_to='project_progress_images/', null=True, blank=True)
 
     def __str__(self) -> str:
-        return f"{self.project.projectID} {self.phase}"
+        return f"{self.project.projectID} - {self.phase.name}"
 
 class ProjectManager(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_admin", null=False, blank=False, unique=True)

@@ -93,7 +93,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'pmdashboard',  # The database name (from the URL)
         'USER': 'root',   # The username (from the URL)
-        'PASSWORD': 'mckenzie007',  # The password (from the URL)
+        'PASSWORD': '2000',  # The password (from the URL) mckenzie007
         'HOST': 'localhost',  # The host (from the URL)
         'PORT': '3306',  # The port (from the URL)
         # 'OPTIONS': {
@@ -140,6 +140,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static/"),]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
