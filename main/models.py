@@ -19,6 +19,9 @@ class ProjectPhase(models.Model):
     phase_number = models.IntegerField(blank=False, null=False)
     name = models.CharField(max_length=255, blank=False, null=False)
 
+    class Meta:
+        unique_together = ("project", "phase_number")
+
     def __str__(self) -> str:
         return f"{self.project.name} - {self.name}"
 
@@ -42,6 +45,9 @@ class ProjectProgress(models.Model):
     date = models.DateTimeField(null=False, blank=False, default=datetime.now)
     comment = models.TextField()
     image = models.ImageField(upload_to='project_progress_images/', null=True, blank=True)
+
+    class Meta:
+        unique_together = ("project", "phase")
 
     def __str__(self) -> str:
         return f"{self.project.projectID} - {self.phase.name}"
