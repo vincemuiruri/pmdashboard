@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -16,8 +16,10 @@ def index(request):
     user = request.user
     if user.is_authenticated:
         is_admin = utils.is_admin(user)
+
     return render(request, 'index.html', {"user": user, "is_admin":is_admin})
 
+    #return HttpResponse("Homepage")
 @login_required(login_url="/auth/login")
 def add_new_form(request):
     user = request.user
@@ -67,7 +69,7 @@ def add_new_form(request):
                 "project_id": project.projectID
             })
 
-    return render(request, 'addnewform.html', {"projects": projects})
+    return render(request, 'addnewform.html', {"projects": projects, "user": user, "is_admin": is_admin})
 
 @login_required(login_url="/auth/login")
 def contrators_form(request):
@@ -135,13 +137,14 @@ def contrators_form(request):
                 })
     except Exception as e:
         print(f"Error: {e}")
-    return render(request, 'contractors.html', {"project":project, "phases": phases})
+    return render(request, 'contractors.html', {"project":project, "phases": phases, "user": user, "is_contractor": is_contractor})
 
 @login_required(login_url="/auth/login")
 def dashboard_view(request):
     user = request.user
+    is_user_admin = utils.is_admin(user)
 
-    if not utils.is_admin(user):
+    if not is_user_admin:
         return HttpResponseForbidden("You are not authorized to view this page. Only for project managers")
     if request.method != "GET":
         return HttpResponse("Method not allowed.")
@@ -162,8 +165,8 @@ def dashboard_view(request):
     except Exception as e:
         print(f"Error: {e}")
 
-    print(f"Project: {project_list}")
-    return render(request, 'dashboard.html', {"user": user, "projects": project_list})
+    #print(f"Project: {project_list}")
+    return render(request, 'dashboard.html', {"user": user, "is_admin": is_user_admin, "projects": project_list})
     
     
 
@@ -173,11 +176,11 @@ def table_data_view(request):
     is_admin = utils.is_admin(user)
 
     if not is_admin:
-        return HttpResponseForbidden("Not allowed to view this page")
+        return HttpResponseForbidden("Not allowed to view this page.")
 
     projects = get_all_projects()
 
-    return render(request, 'tables-data.html', {"projects": projects})
+    return render(request, 'tables-data.html', {"projects": projects, "is_admin": is_admin, "user": user})
 
 def get_all_projects():
     projects = []
@@ -271,7 +274,9 @@ def users_profile_view(request):
     print(f"Contractor info: {contractor_info}")
     return render(request, 'users-profile.html', {
         "contractor": contractor_info,
-        "is_me": is_me
+        "is_me": is_me,
+        "user": user,
+        "is_contractor": is_user_contractor
     })
 
 @csrf_exempt
@@ -356,7 +361,6 @@ def signup(request):
 
     return render(request, "pages-register.html", {})
     
-@csrf_exempt
 def logout_request(request):
     logout(request)
-    return JsonResponse({'status': 200, 'message': 'Logged out successfully'})
+    return  redirect("/")

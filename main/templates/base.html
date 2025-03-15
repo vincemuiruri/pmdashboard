@@ -249,7 +249,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
+              <a class="dropdown-item d-flex align-items-center" href="/auth/logout">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>
@@ -267,6 +267,7 @@
   <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
+    {% if is_admin %}
 
       <li class="nav-item">
         <a class="nav-link " href="/dashboard">
@@ -275,7 +276,6 @@
         </a>
       </li><!-- End Dashboard Nav -->
 
-   
       <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-layout-text-window-reverse"></i><span>Projects</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -296,33 +296,34 @@
         </ul>
       </li><!-- End Tables Nav -->
 
-   
+      {% endif %}
 
 
       <li class="nav-heading">Pages</li>
-
+      {% if is_contractor %}
       <li class="nav-item">
         <a class="nav-link collapsed" href="/user/profile">
           <i class="bi bi-person"></i>
           <span>Profile</span>
         </a>
       </li><!-- End Profile Page Nav -->
-
+      {% endif %}
       
 
      
-
+      {% if is_admin %}
       <li class="nav-item">
         <a class="nav-link collapsed" href="/auth/signup">
           <i class="bi bi-card-list"></i>
           <span>Register</span>
         </a>
       </li><!-- End Register Page Nav -->
+      {% endif %}
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="/auth/login">
+        <a class="nav-link collapsed" href="{% if user.is_authenticated %} /auth/logout {% else %} /auth/login {% endif %}">
           <i class="bi bi-box-arrow-in-right"></i>
-          <span>Login</span>
+          <span>{% if user.is_authenticated %} Logout {% else %} Login {% endif %}</span>
         </a>
       </li><!-- End Login Page Nav -->
 
