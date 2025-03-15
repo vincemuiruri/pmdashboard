@@ -6,15 +6,14 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title><?= $title ?? 'Register page' ?></title>
+  <!-- <title>Register Contractor <?= $title ?? 'Register page' ?> </title> -->
+  <title>Register Contractor</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
-  <!-- Favicons -->
   <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
   <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
 
-  <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
@@ -50,7 +49,7 @@
                   <img src="{% static 'assets/img/logo.png' %}" alt="">
                   
                 </a>
-              </div><!-- End Logo -->
+              </div>
 
               <div class="card mb-3">
 
@@ -64,7 +63,7 @@
                   <form class="row g-3 needs-validation" novalidate action="pages-register.html" id="register-form" method="post">
                     {% csrf_token %}
                     <div class="col-12">
-                      <label for="userid" class="form-label">User ID</label>
+                      <label for="userid" class="form-label">ID Number</label>
                       <input type="text" name="userID" class="form-control" id="userID" required>
                       <div class="invalid-feedback">Please, enter your user ID!</div>
                     </div>
@@ -116,6 +115,7 @@
                         <div class="invalid-feedback">Please enter contractors Project Name.</div>
                       </div>
                     </div>
+                    
                     <div class="col-12">
                       <label for="projectname" class="form-label">Deadline</label>
                       <div class="input-group has-validation">
@@ -124,16 +124,31 @@
                         <div class="invalid-feedback">Please enter contractors Project Deadline.</div>
                       </div>
                     </div>
-                    <!--<div class="col-12">
-                      <div class="form-check">
-                        <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required>
-                        <label class="form-check-label" for="acceptTerms">I agree and accept the <a href="#">terms and conditions</a></label>
-                        <div class="invalid-feedback">You must agree before submitting.</div>
-                      </div>
-                    </div>-->
+                    
                     <div class="col-12">
-                      <button class="btn btn-primary w-100" type="submit">Create Account</button>
+                      <button class="btn btn-primary w-100" type="submit" onclick="showSpinner()" onclick="validateDate()">Create Account</button>
+                      <div class="d-flex justify-content-center align-items-center">
+                      
+                        <div id="spinner" class="spinner-border text-primary d-none ms-3" role="status">
+                         
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
+                      <button type="reset" class="btn btn-primary w-100" type="submit" style="margin-top: 20px;background-color: grey;border-color: grey;" onclick="hideSpinner()">Reset</button>
+                      
+                    </div>
+                    
+              
+                  <script>
+                      function showSpinner() {
+                          document.getElementById("spinner").classList.remove("d-none");
+                      }
+                      function hideSpinner() {
+                          document.getElementById("spinner").classList.add("d-none");
+                      }
+                  </script>
+                    </div>
+                    
                     <!--<div class="col-12">
                       <p class="small mb-0">Already have an account? <a href="pages-login.html">Log in</a></p>
                     </div>
@@ -150,11 +165,11 @@
       </section>
 
     </div>
-  </main><!-- End #main -->
+  </main>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <!-- Vendor JS Files -->
+  
   <script src="{% static 'assets/vendor/apexcharts/apexcharts.min.js' %}"></script>
   <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'assets/vendor/chart.js/chart.umd.js' %}"></script>
@@ -164,7 +179,7 @@
   <script src="{% static 'assets/vendor/tinymce/tinymce.min.js' %}"></script>
   <script src="{% static 'assets/vendor/php-email-form/validate.js' %}"></script>
 
-  <!-- Template Main JS File -->
+  
   <script src="{% static 'assets/js/main.js' %}"></script>
 
 </body>

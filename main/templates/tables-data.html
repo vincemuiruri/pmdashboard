@@ -318,7 +318,7 @@
       </li><!-- End Register Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="/auth/signin">
+        <a class="nav-link collapsed" href="/auth/login">
           <i class="bi bi-box-arrow-in-right"></i>
           <span>Login</span>
         </a>
@@ -366,76 +366,15 @@
                   </tr>
                 </thead>
                 <tbody>
+                  {% for project in projects %}
                   <tr>
-                    <td>001</td>
-                    <td>Jeph Nyamai</td>
-                    <td>Wendanyi Bridge</td>
-                    <td>2025/03/11</td>
-                    <td>40%</td>
+                    <td>{{ project.project_id }}</td>
+                    <td>{{ project.contractor }}</td>
+                    <td>{{ project.project_name }}</td>
+                    <td>{{ project.deadline }}</td>
+                    <td>{{ project.status }}</td>
                   </tr>
-                  <tr>
-                    <td>002</td>
-                    <td>Vince Muiruri</td>
-                    <td>Ruiru Bridge</td>
-                    <td>2025/04/07</td>
-                    <td>70%</td>
-                  </tr>
-                  <tr>
-                    <td>003</td>
-                    <td>Ndungu K</td>
-                    <td>nyayo Road</td>
-                    <td>2026/09/08</td>
-                    <td>30%</td>
-                  </tr>
-                  <tr>
-                    <td>004</td>
-                    <td>Joe Kamakis</td>
-                    <td>KSukari Tarmaking</td>
-                    <td>2025/09/11</td>
-                    <td>50%</td>
-                  </tr>
-                  <tr>
-                    <td>005</td>
-                    <td>Rahma Tahidi</td>
-                    <td>KU Gate</td>
-                    <td>2026/11/09</td>
-                    <td>100%</td>
-                  </tr>
-                  <tr>
-                    <td>006</td>
-                    <td>Monica Njoki</td>
-                    <td>Upperhill Gate</td>
-                    <td>2026/03/08</td>
-                    <td>20%</td>
-                  </tr>
-                  <tr>
-                    <td>007</td>
-                    <td>Monica Njoki</td>
-                    <td>Upperhill Gate</td>
-                    <td>2026/03/08</td>
-                    <td>20%</td>
-                  </tr>
-                  <tr>
-                    <td>008</td>
-                    <td>Rahma Tahidi</td>
-                    <td>KU Gate</td>
-                    <td>2026/11/09</td>
-                    <td>100%</td>
-                  </tr>
-                  <tr>
-                    <td>009</td>
-                    <td>Vince Muiruri</td>
-                    <td>Ruiru Bridge</td>
-                    <td>2025/04/07</td>
-                    <td>70%</td>
-                  </tr>
-                  <tr>
-                    <td>010</td>
-                    <td>Vince Muiruri</td>
-                    <td>Ruiru Bridge</td>
-                    <td>2025/04/07</td>
-                    <td>70%</td>
-                  </tr>
+                  {% endfor %}
                 </tbody>
               </table>
               <!-- End Table with stripped rows -->

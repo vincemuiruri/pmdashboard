@@ -28,7 +28,7 @@ $(document).ready(function(){
             if (data.status === 200) {
                 alert("Login successful!");
                 // Redirect or perform other actions
-                window.location.href = "/dashboard";
+                window.location.href = data.redirect_url;
             } else {
                 alert("Login failed: " + data.message);
             }
@@ -81,4 +81,5 @@ $(document).ready(function(){
         }
         return true;
     }
+    
 });

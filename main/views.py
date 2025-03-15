@@ -11,7 +11,11 @@ from . import utils
 
 # Home page view
 def index(request):
-    return render(request, 'index.html', {})
+    is_admin = False
+    user = request.user
+    if user.is_authenticated:
+        is_admin = utils.is_admin(user)
+    return render(request, 'index.html', {"user": user, "is_admin":is_admin})
 
 @login_required(login_url="/auth/login")
 def add_new_form(request):
@@ -50,8 +54,19 @@ def add_new_form(request):
         except Exception as e:
             print(f"Error: {e}")
             return JsonResponse({'status': 500, 'message': f'Error parsing request: {e}'}, status=500)
+    projects_data = Project.objects.all()
 
-    return render(request, 'addnewform.html', {})
+    projects = []
+
+    if projects is not None:
+        for project in projects_data:
+
+            projects.append({
+                "project_name": project.name,
+                "project_id": project.projectID
+            })
+
+    return render(request, 'addnewform.html', {"projects": projects})
 
 @login_required(login_url="/auth/login")
 def contrators_form(request):
@@ -93,8 +108,33 @@ def contrators_form(request):
         except Exception as e:
             print(f"Error: {e}")
             return JsonResponse({'status': 500, 'message': f'Error parsing request: {e}'}, status=500)
-    
-    return render(request, 'contractors.html', {})
+
+
+    project = {
+        "project_id":"",
+        "project_name":""
+    }
+    phases = []
+
+    try:
+        contractor = Contractor.objects.filter(user=user).first()
+
+        if contractor:
+            cont_project = contractor.project
+
+            project["project_id"] = cont_project.projectID
+            project["project_name"] = cont_project.name
+
+            project_phases = ProjectPhase.objects.filter(project=cont_project).all()
+
+            for phase in project_phases:
+                phases.append({
+                    "phase_number": phase.phase_number,
+                    "phase_name": phase.name
+                })
+    except Exception as e:
+        print(f"Error: {e}")
+    return render(request, 'contractors.html', {"project":project, "phases": phases})
 
 @login_required(login_url="/auth/login")
 def dashboard_view(request):
@@ -104,8 +144,31 @@ def dashboard_view(request):
     
     return HttpResponseForbidden("You are not authorized to view this page. Only for project managers")
 
+@login_required(login_url="/auth/login")
 def table_data_view(request):
-    return render(request, 'tables-data.html', {})
+    user = request.user
+    is_admin = utils.is_admin(user)
+
+    if not is_admin:
+        return HttpResponseForbidden("Not allowed to view this page")
+
+    projects = []
+
+    try:
+        project_data = Project.objects.all()
+
+        for project in project_data:
+            project_contractor = Contractor.objects.filter(project=project).first()
+            projects.append({
+                "project_name": project.name,
+                "project_id": project.projectID,
+                "deadline": project.deadline,
+                "status": project.progress,
+                "contractor": f"{project_contractor.first_name} {project_contractor.last_name}"
+            })
+    except Exception as e:
+        print(f"Error: {e}")
+    return render(request, 'tables-data.html', {"projects": projects})
 
 @login_required(login_url="/auth/login")
 def users_profile_view(request):
@@ -129,7 +192,10 @@ def login_request(request):
             user = authenticate(username=username, password=password)
             if user:
                 login(request, user)
-                return JsonResponse({'status': 200, 'message': 'Logged in successfully'})
+                
+                is_admin = utils.is_admin(user)
+                redirect_url = "/dashboard" if is_admin else "/project/details"
+                return JsonResponse({'status': 200, 'message': 'Logged in successfully', "redirect_url": redirect_url})
             else:
                 return JsonResponse({'status': 401, 'message': 'Invalid credentials'})
         except json.JSONDecodeError:
@@ -162,7 +228,7 @@ def signup(request):
             )
             user.save()
 
-            utils.add_user_to_group("contractor")
+            utils.add_user_to_group(user,"contractor")
             
             new_project = Project.objects.create(
                 projectID=project_id,

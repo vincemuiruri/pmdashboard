@@ -36,17 +36,17 @@ $(document).ready(function () {
         }
 
         // Prepare FormData
-        const formData = new FormData();
-        formData.append("project_id", projectId);
-        formData.append("phase_number", phaseNumber);
-        formData.append("comment", comment);
+        const formData = new FormData(this);
+        // formData.append("project_id", projectId);
+        // formData.append("phase_number", phaseNumber);
+        // formData.append("comment", comment);
 
         if (imageInput) {
             formData.append("image", imageInput);
         }
 
         // Send data to backend
-        fetch("project/details", {
+        fetch("/project/details", {
             body: formData,
             method: "POST",
             headers: {

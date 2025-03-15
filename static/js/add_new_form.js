@@ -22,7 +22,7 @@ $(document).ready(function () {
         const formData = new FormData(this);
 
         // Send data to backend
-        fetch("project/add", {
+        fetch("/project/add", {
             body: formData,
             method: "POST",
             headers: {

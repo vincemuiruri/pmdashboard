@@ -27,8 +27,22 @@
                     <form id="contactForm" data-sb-form-api-token="API_TOKEN">
                         
                         <div class="row input-group-newsletter">
-                            <a href="/auth/login">
-                            <div class="col-auto"><button class="btn btn-primary disabled" id="submitButton" type="submit">Login</button></div>
+                            <a href="{% if user.is_authenticated %}
+                                        {% if is_admin %}
+                                        /dashboard
+                                        {%else %}
+                                        /project/details
+                                        {% endif %}
+                                        {%else %}
+                                        /auth/login
+                                    {% endif %}">
+                            <div class="col-auto"><button class="btn btn-primary disabled" id="submitButton" type="submit">
+                                {% if user.is_authenticated %}
+                                Continue
+                                {% else %}
+                                Login
+                                {% endif %}
+                            </button></div>
                             </a>
                         </div>
                         

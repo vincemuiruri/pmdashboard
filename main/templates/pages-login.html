@@ -89,9 +89,22 @@
                       </div>
                     </div>
                     <div class="col-12">
-                      <button class="btn btn-primary w-100" type="submit">Login</button>
+                      <button class="btn btn-primary w-100" type="submit" onclick="showSpinner()">Login</button>
+                      <div class="d-flex justify-content-center align-items-center">
+                      
+                        <div id="spinner" class="spinner-border text-primary d-none ms-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
                     </div>
                     
+              
+                  <script>
+                      function showSpinner() {
+                          document.getElementById("spinner").classList.remove("d-none");
+                      }
+                  </script>
+                                
                   </form>
 
                 </div>
