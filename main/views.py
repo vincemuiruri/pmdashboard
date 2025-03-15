@@ -237,7 +237,7 @@ def users_profile_view(request):
     user_id = request.GET.get("u", None)
 
     is_user_contractor = utils.is_contrator(user)
-
+    is_admin=utils.is_admin(user)
     if not(is_user_contractor or user_id):
         return render(request, "404.html", {"message": "User info doesn't exists"})
 
@@ -276,7 +276,8 @@ def users_profile_view(request):
         "contractor": contractor_info,
         "is_me": is_me,
         "user": user,
-        "is_contractor": is_user_contractor
+        "is_contractor": is_user_contractor,
+        "is_admin": is_admin
     })
 
 @csrf_exempt
