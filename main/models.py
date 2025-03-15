@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 # Create your models here.
 
@@ -19,6 +21,9 @@ class ProjectPhase(models.Model):
     phase_number = models.IntegerField(blank=False, null=False)
     name = models.CharField(max_length=255, blank=False, null=False)
 
+    class Meta:
+        unique_together = ("project", "phase_number")
+
     def __str__(self) -> str:
         return f"{self.project.name} - {self.name}"
 
@@ -35,6 +40,11 @@ class Contractor(models.Model):
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"
 
+# Signal to delete the User when a Contractor is deleted
+@receiver(post_delete, sender=Contractor)
+def delete_user_with_contractor(sender, instance, **kwargs):
+    if instance.user:
+        instance.user.delete()  # Deletes the associated user
 
 class ProjectProgress(models.Model):
     project = models.ForeignKey(Project, related_name="project_progress", on_delete=models.CASCADE)
@@ -42,6 +52,9 @@ class ProjectProgress(models.Model):
     date = models.DateTimeField(null=False, blank=False, default=datetime.now)
     comment = models.TextField()
     image = models.ImageField(upload_to='project_progress_images/', null=True, blank=True)
+
+    class Meta:
+        unique_together = ("project", "phase")
 
     def __str__(self) -> str:
         return f"{self.project.projectID} - {self.phase.name}"
