@@ -3,10 +3,11 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import json
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.contrib.auth.models import User
 from . models import Project, Contractor, ProjectProgress, ProjectPhase
 from . import utils
+from django.core.paginator import Paginator
 
 
 # Home page view
@@ -139,10 +140,32 @@ def contrators_form(request):
 @login_required(login_url="/auth/login")
 def dashboard_view(request):
     user = request.user
-    if utils.is_admin(user):
-        return render(request, 'dashboard.html', {"user": user})
+
+    if not utils.is_admin(user):
+        return HttpResponseForbidden("You are not authorized to view this page. Only for project managers")
+    if request.method != "GET":
+        return HttpResponse("Method not allowed.")
     
-    return HttpResponseForbidden("You are not authorized to view this page. Only for project managers")
+    page_number = request.GET.get("page", "1")
+
+    # get all projects then paginate
+    project_list = []
+    try:
+        projects = get_all_projects()
+
+        # Sort projects by "status" in ascending order
+        sorted_projects = sorted(projects, key=lambda x: x["status"], reverse=True)
+        # Paginate the sorted list
+        project_pg = Paginator(sorted_projects, 8 if page_number == "1" else 5)
+        project_batch = project_pg.get_page(page_number)
+        project_list = project_batch.object_list
+    except Exception as e:
+        print(f"Error: {e}")
+
+    print(f"Project: {project_list}")
+    return render(request, 'dashboard.html', {"user": user, "projects": project_list})
+    
+    
 
 @login_required(login_url="/auth/login")
 def table_data_view(request):
@@ -152,27 +175,104 @@ def table_data_view(request):
     if not is_admin:
         return HttpResponseForbidden("Not allowed to view this page")
 
+    projects = get_all_projects()
+
+    return render(request, 'tables-data.html', {"projects": projects})
+
+def get_all_projects():
     projects = []
 
     try:
-        project_data = Project.objects.all()
+        project_data = Project.objects.prefetch_related("project_contractor", "project_progress").all()
 
         for project in project_data:
-            project_contractor = Contractor.objects.filter(project=project).first()
+            
+            project_contractor = project.project_contractor.first()
+            status = round(compute_project_progress(project), 1)
+
             projects.append({
                 "project_name": project.name,
                 "project_id": project.projectID,
+                "str_status": project.status,
                 "deadline": project.deadline,
-                "status": project.progress,
-                "contractor": f"{project_contractor.first_name} {project_contractor.last_name}"
+                "status": status,
+                "contractor": f"{project_contractor.first_name} {project_contractor.last_name}",
+                "contractor_id": project_contractor.userID
             })
+
     except Exception as e:
         print(f"Error: {e}")
-    return render(request, 'tables-data.html', {"projects": projects})
+
+    return projects
+
+def compute_project_progress(project):
+    try:
+        project_phases = project.phases.all()
+
+        project_progress = project.project_progress.select_related("phase").all()
+
+        completed_phases = [
+            phase for phase in project_phases 
+            if any(phase.phase_number == progress_phase.phase.phase_number for progress_phase in project_progress)
+        ]
+        
+        total_phases = project_phases.count()
+
+        total_completed = len(completed_phases)
+
+        
+        return (total_completed / total_phases) * 100
+    except Exception as e:
+        print(f"Error: {e}")
+        return 0
+    
 
 @login_required(login_url="/auth/login")
 def users_profile_view(request):
-    return render(request, 'users-profile.html', {})
+    user = request.user
+
+    user_id = request.GET.get("u", None)
+
+    is_user_contractor = utils.is_contrator(user)
+
+    if not(is_user_contractor or user_id):
+        return render(request, "404.html", {"message": "User info doesn't exists"})
+
+    contractor = None
+    contractor_info = {}
+    try:
+        if is_user_contractor:
+            contractor = user.user_contractor
+            user_id = contractor.userID
+        
+        else:
+            contractor = Contractor.objects.select_related("project").filter(userID=user_id).first()
+
+        if not Contractor:
+            return render(request, "404.html", {"message": "Contractor information not found."})
+        
+        is_me = contractor.user == user
+        contractor_project = contractor.project
+
+        contractor_info["first_name"] = contractor.first_name
+        contractor_info["last_name"] = contractor.last_name
+        contractor_info["about"] = contractor.about
+        contractor_info["phone_number"] = contractor.phone_number
+
+        project_map = {
+            "project_name":  contractor_project.name,
+            "status": str(round(compute_project_progress(contractor_project)))
+        }
+        contractor_info["project"] = project_map
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+    print(f"Contractor info: {contractor_info}")
+    return render(request, 'users-profile.html', {
+        "contractor": contractor_info,
+        "is_me": is_me
+    })
 
 @csrf_exempt
 def login_request(request):

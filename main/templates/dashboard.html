@@ -353,30 +353,19 @@
           <div class="row">
           
             <!-- PROJECTS Card -->
+          {% if projects|length > 0 %}
             <div class="col-xxl-4 col-md-6">
               <div class="card info-card sales-card">
 
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-                <a href="/user/profile">
+                <a href="/user/profile?u={{ projects.0.contractor_id }}">
                 <div class="card-body">
-                  <h5 class="card-title">Nyayo Road<span><br>
-                  - By Ndungu K</span></h5>
+                  <h5 class="card-title">{{ projects.0.project_name }}<span><br>
+                  - {{ projects.0.contractor }}</span></h5>
 
                   <div class="d-flex align-items-center">
                     
                     <div class="ps-3">
-                      <h6>30%</h6>
+                      <h6>{{ projects.0.status }}%</h6>
                    </div>
                   </div>
                 </div>
@@ -384,32 +373,22 @@
 
               </div>
             </div><!-- End projects Card -->
-            
+            {% endif %}
                <!-- PROJECTS Card -->
-               <div class="col-xxl-4 col-md-6">
+            {% if projects|length > 1 %}
+            <div class="col-xxl-4 col-md-6">
               <div class="card info-card sales-card">
 
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-                <a href="/user/profile">
+                
+                <a href="/user/profile?u={{ projects.1.contractor_id }}">
                 <div class="card-body">
-                  <h5 class="card-title">wendanyi Bridge<span><br>
-                  - By Jeph Wamai</span></h5>
+                  <h5 class="card-title">{{ projects.1.project_name }}<span><br>
+                  - {{ projects.1.contractor }}</span></h5>
 
                   <div class="d-flex align-items-center">
                     
                     <div class="ps-3">
-                      <h6>40%</h6>
+                      <h6>{{ projects.1.status }}%</h6>
                    </div>
                   </div>
                 </div>
@@ -417,32 +396,21 @@
 
               </div>
             </div><!-- End projects Card -->
-
+            {% endif %}
+            {% if projects|length > 2 %}
              <!-- PROJECTS Card -->
-             <div class="col-xxl-4 col-md-6">
+            <div class="col-xxl-4 col-md-6">
               <div class="card info-card sales-card">
 
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-                <a href="/user/profile">
+                <a href="/user/profile?u={{ projects.2.contractor_id }}">
                 <div class="card-body">
-                  <h5 class="card-title">Ruiru Bridge<span><br>
-                  - By Vince Muiruri</span></h5>
+                  <h5 class="card-title">{{ projects.2.project_name }}<span><br>
+                  - {{ projects.2.contractor }}</span></h5>
 
                   <div class="d-flex align-items-center">
                     
                     <div class="ps-3">
-                      <h6>70%</h6>
+                      <h6>{{ projects.2.status }}%</h6>
                    </div>
                   </div>
                 </div>
@@ -450,6 +418,7 @@
 
               </div>
             </div><!-- End projects Card -->
+          {% endif %}
             
    <!-- Recent Sales -->
    <div class="col-12">
@@ -474,7 +443,7 @@
                   <table class="table table-borderless datatable">
                     <thead>
                       <tr>
-                        <th scope="col">Proj ID</th>
+                        <th scope="col">#</th>
                         <th scope="col">Contractor</th>
                         <th scope="col">Proj Name</th>
                         <th scope="col">Progress</th>
@@ -482,41 +451,25 @@
                       </tr>
                     </thead>
                     <tbody>
+                      {% if projects|length > 0 %}
+                        {% for project in projects %}
+                        <tr>
+                          <th scope="row"><a href="#">{{ forloop.counter }}</a></th>
+                          <td>{{ project.contractor }}</td>
+                          <td><a href="/user/profile?u={{ project.contractor_id }}" class="text-primary">{{ project.project_name }}</a></td>
+                          <td>{{ project.status }}%</td>
+                          <td><span class="badge {% if project.status >= 100 %} bg-success {% else %} bg-warning {% endif %}">{% if project.status >= 100 %}complete {% else %} ongoing {% endif %}</span></td>
+                        </tr>
+                        {% endfor %}
+                      {% else %}
                       <tr>
-                        <th scope="row"><a href="#">001</a></th>
-                        <td>Jeph Wamai</td>
-                        <td><a href="#" class="text-primary">Wendanyi Bridge</a></td>
-                        <td>40%</td>
-                        <td><span class="badge bg-warning">Ongoing</span></td>
+                        <div class="alert alert-success" role="alert">
+                          No available projects!
+                        </div>
                       </tr>
-                      <tr>
-                        <th scope="row"><a href="#">002</a></th>
-                        <td>Vince Muiruri</td>
-                        <td><a href="#" class="text-primary">Ruiru Bridge</a></td>
-                        <td>70%</td>
-                        <td><span class="badge bg-warning">Ongoing</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">003</a></th>
-                        <td>Ndungu K</td>
-                        <td><a href="#" class="text-primary">nyayo Road</a></td>
-                        <td>30%</td>
-                        <td><span class="badge bg-warning">Ongoing</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">004</a></th>
-                        <td>Joe Kamakis</td>
-                        <td><a href="#" class="text-primar">KSukari Tarmaking</a></td>
-                        <td>50%</td>
-                        <td><span class="badge bg-warning">Ongoing</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">005</a></th>
-                        <td>Rahma Tahidi</td>
-                        <td><a href="#" class="text-primary">KU Gate</a></td>
-                        <td>100%</td>
-                        <td><span class="badge bg-success">Completed</span></td>
-                      </tr>
+                      
+                      {% endif %}
+                    
                     </tbody>
                   </table>
 

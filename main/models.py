@@ -28,6 +28,9 @@ class Contractor(models.Model):
     first_name = models.CharField(max_length=30, blank=False, null=False)
     last_name = models.CharField(max_length=30, blank=False, null=False)
     project = models.ForeignKey(Project, related_name="project_contractor", blank=False, null=False, on_delete=models.CASCADE)
+    about = models.TextField(blank=False, null=False, default="Project Contractor")
+    #avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
+    phone_number = models.CharField(max_length=20, blank=False, null=True, default="")
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"
@@ -48,7 +51,7 @@ class ProjectManager(models.Model):
     userID = models.CharField(max_length=30, blank=False, null=False, unique=True)
     first_name = models.CharField(max_length=30, blank=False, null=False)
     last_name = models.CharField(max_length=30, blank=False, null=False)
-
+    
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"
 

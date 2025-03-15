@@ -93,7 +93,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'pmdashboard',  # The database name (from the URL)
         'USER': 'root',   # The username (from the URL)
-        'PASSWORD': 'mckenzie007',  # The password (from the URL) mckenzie007
+        'PASSWORD': '2000',  # The password (from the URL) mckenzie007
         'HOST': 'localhost',  # The host (from the URL)
         'PORT': '3306',  # The port (from the URL)
         # 'OPTIONS': {
