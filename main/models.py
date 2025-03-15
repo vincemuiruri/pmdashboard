@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 # Create your models here.
 
@@ -38,6 +40,11 @@ class Contractor(models.Model):
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"
 
+# Signal to delete the User when a Contractor is deleted
+@receiver(post_delete, sender=Contractor)
+def delete_user_with_contractor(sender, instance, **kwargs):
+    if instance.user:
+        instance.user.delete()  # Deletes the associated user
 
 class ProjectProgress(models.Model):
     project = models.ForeignKey(Project, related_name="project_progress", on_delete=models.CASCADE)
