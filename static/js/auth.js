@@ -68,7 +68,49 @@ $(document).ready(function(){
                 console.error(error);
             })
         }
-
+        function validateForm() {
+            let isValid = true;
+        
+            // Get input values
+            let project = document.getElementById("project_id").value;
+            let phaseNumber = document.getElementById("phase_number").value;
+            let phaseName = document.getElementById("phase_name").value;
+        
+            // Error message elements
+            let projectError = document.getElementById("project_error");
+            let phaseNumberError = document.getElementById("phase_number_error");
+            let phaseNameError = document.getElementById("phase_name_error");
+        
+            // Reset errors
+            projectError.innerText = "";
+            phaseNumberError.innerText = "";
+            phaseNameError.innerText = "";
+        
+            // Validate project selection
+            if (project === "") {
+              projectError.innerText = "Please select a project.";
+              isValid = false;
+            }
+        
+            // Validate phase number
+            if (phaseNumber === "" || phaseNumber <= 0) {
+              phaseNumberError.innerText = "Please enter a valid phase number (greater than 0).";
+              isValid = false;
+            }
+        
+            // Validate phase name
+            if (phaseName.trim() === "") {
+              phaseNameError.innerText = "Project phase name cannot be empty.";
+              isValid = false;
+            }
+        
+            // If form is invalid, prevent submission and hide spinner
+            if (!isValid) {
+              hideSpinner();
+            }
+        
+            return isValid;
+          }
 
     });
 

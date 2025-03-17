@@ -116,17 +116,32 @@
                       </div>
                     </div>
                     
-                    <div class="col-12">
+                    <!-- <div class="col-12">
                       <label for="projectname" class="form-label">Deadline</label>
                       <div class="input-group has-validation">
                         
                         <input type="date" name="deadline" class="form-control" id="deadline" required>
                         <div class="invalid-feedback">Please enter contractors Project Deadline.</div>
                       </div>
+                    </div> -->
+                    <div class="col-12">
+                      <label for="deadline" class="form-label">Deadline</label>
+                      <div class="input-group has-validation">
+                        <input type="date" name="deadline" class="form-control" id="deadline" required>
+                        <div class="invalid-feedback">Please enter the contractor's project deadline.</div>
+                      </div>
                     </div>
                     
+                    <script>
+                      // Set the min date to today
+                      document.addEventListener("DOMContentLoaded", function () {
+                        let today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+                        document.getElementById("deadline").setAttribute("min", today);
+                      });
+                    </script>
+                    
                     <div class="col-12">
-                      <button class="btn btn-primary w-100" type="submit" onclick="showSpinner()" onclick="validateDate()">Create Account</button>
+                      <button class="btn btn-primary w-100" type="submit" onclick="showSpinner()" onsubmit="return validateForm()">Create Account</button>
                       <div class="d-flex justify-content-center align-items-center">
                       
                         <div id="spinner" class="spinner-border text-primary d-none ms-3" role="status">
@@ -141,13 +156,27 @@
               
                   <script>
                       function showSpinner() {
-                          document.getElementById("spinner").classList.remove("d-none");
+                          // document.getElementById("spinner").classList.remove("d-none");
+                          let spinner = document.getElementById("spinner");
+                          let submitBtn = document.getElementById("submitBtn");
+
+                         // Show spinner and disable submit button
+                          spinner.classList.remove("d-none");
+                          submitBtn.disabled = true;
                       }
                       function hideSpinner() {
-                          document.getElementById("spinner").classList.add("d-none");
+                          // document.getElementById("spinner").classList.add("d-none");
+                          let spinner = document.getElementById("spinner");
+                          let submitBtn = document.getElementById("submitBtn");
+
+                          // Hide spinner and enable submit button
+                          spinner.classList.add("d-none");
+                          submitBtn.disabled = false;
                       }
                   </script>
                     </div>
+                  
+                  
                     
                     <!--<div class="col-12">
                       <p class="small mb-0">Already have an account? <a href="pages-login.html">Log in</a></p>
