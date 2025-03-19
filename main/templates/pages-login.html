@@ -72,15 +72,17 @@
                       <div class="input-group has-validation">
                       
                         <input type="text" name="userID" class="form-control" id="userID" required>
-                        <div class="invalid-feedback">Please enter your username.</div>
+                        <div class="invalid-feedback">Please enter valid ID Number.</div>
                       </div>
                     </div>
+                    
 
                     <div class="col-12">
                       <label for="yourPassword" class="form-label">Password</label>
                       <input type="password" name="password" class="form-control" id="password" required>
                       <div class="invalid-feedback">Please enter your password!</div>
                     </div>
+                    
 
                     <div class="col-12">
                       <div class="form-check">
@@ -97,7 +99,44 @@
                         </div>
                     </div>
                     </div>
-                    
+                    <script>
+                      // Restrict deadline to future dates
+                      
+                      // Real-time Validation
+                      document.addEventListener("DOMContentLoaded", function () {
+                        const form = document.getElementById("login-form");
+  
+                        const validators = {
+                          userID: value => /^\d{5,10}$/.test(value), // Only numbers, length 5-10
+                         
+                          password: value => value.length >= 6, // Minimum 6 characters
+                          
+                        };
+  
+                        form.querySelectorAll("input").forEach(input => {
+                          input.addEventListener("input", function () {
+                            if (validators[input.id](input.value)) {
+                              input.classList.remove("is-invalid");
+                              input.classList.add("is-valid");
+                            } else {
+                              input.classList.remove("is-valid");
+                              input.classList.add("is-invalid");
+                            }
+                          });
+                        });
+                      });
+  
+                      function showSpinner() {
+                        document.getElementById("spinner").classList.remove("d-none");
+                        document.getElementById("submitBtn").disabled = true;
+                      }
+  
+                      function hideSpinner() {
+                        document.getElementById("spinner").classList.add("d-none");
+                        document.getElementById("submitBtn").disabled = false;
+                      }
+                      
+                    </script>
               
                     <script>
                       function showSpinner() {
