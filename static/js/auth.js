@@ -26,16 +26,20 @@ $(document).ready(function(){
         .then(data => {
             console.log("Message:", data.message);
             if (data.status === 200) {
-                alert("Login successful!");
+                //alert("Login successful!");
                 // Redirect or perform other actions
                 window.location.href = data.redirect_url;
             } else {
-                alert("Login failed: " + data.message);
+                //alert("Login failed: " + data.message);
+                document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">${data.message}</div>`;
+                showModal();
+
             }
         })
         .catch(error => {
             console.error("Error:", error);
-            alert("Something went wrong. Please try again.");
+            document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">${error}</div>`;
+            showModal();
         });
     });
 
@@ -59,12 +63,15 @@ $(document).ready(function(){
                 const message = data.message;
 
                 if(status == 201){
-                    alert("Account created succesfully!");
+                    document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-success" roler="alert">Account created succesfully!</div>`;
+                    showModal();
                 }else{
-                    alert(message);
+                    document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">${message}</div>`;
+                    showModal();
                 }
             }).catch(error=>{
-                alert("Something went wrong!");
+                document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">Error: ${error}</div>`;
+                showModal();
                 console.error(error);
             })
         }
@@ -118,7 +125,8 @@ $(document).ready(function(){
         const userID = document.getElementById("userID").value;
 
         if(userID.length > 20){
-            alert("Invalid userID");
+            document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">Invalid user id</div>`;
+            showModal();
             return false;
         }
         return true;

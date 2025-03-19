@@ -14,7 +14,8 @@ $(document).ready(function () {
 
         // Check if required fields are filled
         if (!projectId || !phaseName || !phaseNumber) {
-            alert("All fields are required.");
+            document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">All fields are required.</div>`;
+            showModal();
             return;
         }
 
@@ -34,15 +35,18 @@ $(document).ready(function () {
             const status = data.status;
             const message = data.message;
 
-            if (status === 201) {
-                alert("Project phase added successfully!");
-                window.location.reload();
+            if (status === 201 || status === 200) {
+                document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-success" roler="alert">Project phase added successfully!</div>`;
+                showModal();
+                //window.location.reload();
             } else {
-                alert(message);
+                document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">${message}</div>`;
+                showModal();
             }
         })
         .catch(error => {
-            alert("Something went wrong!");
+            document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">Something went wrong: ${error}</div>`;
+            showModal();
             console.error(error);
         });
     });

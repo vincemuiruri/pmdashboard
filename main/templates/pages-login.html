@@ -28,7 +28,7 @@
   <link href="{% static 'assets/vendor/simple-datatables/style.css' %}" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-  <script src="{% static 'js/auth.js' %}"></script>
+
 
 
   
@@ -39,7 +39,6 @@
 </head>
 
 <body style="background-image: url('{% static "assets/img/BACKGROUND.png" %}');">
- 
   
   <main>
     <div class="container">
@@ -160,6 +159,30 @@
 
     </div>
   </main><!-- End #main -->
+  
+  <!-- Modal -->
+  <div class="modal fade" id="general_modal" tabindex="-1" aria-labelledby="general_modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="general_modalLabel">Projika</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="general_modal_body">
+  
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+  </div>
+  <script>
+    function showModal() {
+        var reportModal = new bootstrap.Modal(document.getElementById("general_modal"));
+        reportModal.show();
+      }
+   </script>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
@@ -175,6 +198,7 @@
 
   <!-- Template Main JS File -->
   <script src="{% static 'assets/js/main.js' %}"></script>
+  <script src="{% static 'js/auth.js' %}"></script>
 
 </body>
 

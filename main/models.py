@@ -51,6 +51,7 @@ class ProjectProgress(models.Model):
     phase = models.ForeignKey(ProjectPhase, related_name="progress_phase", on_delete=models.CASCADE)
     date = models.DateTimeField(null=False, blank=False, default=datetime.now)
     comment = models.TextField()
+    is_read = models.BooleanField(default=False)
     image = models.ImageField(upload_to='project_progress_images/', null=True, blank=True)
 
     class Meta:

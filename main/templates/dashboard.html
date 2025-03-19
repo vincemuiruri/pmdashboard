@@ -156,9 +156,10 @@
 
             <script>
               document.addEventListener("DOMContentLoaded", () => {
+                const progress = [{% for project in projects %}{{ project.status }},{% endfor %}];
                 new ApexCharts(document.querySelector("#barChart"), {
                   series: [{
-                    data: [40, 30, 50, 100, 70] // Progress in percentages
+                    data: progress // Progress in percentages
                   }],
                   chart: {
                     type: 'bar',
@@ -174,7 +175,7 @@
                     enabled: false
                   },
                   xaxis: {
-                    categories: ['Wendanyi Bridge', 'Nyayo Road', 'KSukari Tarmaking', 'KU Gate', 'Ruiru Bridge'],
+                    categories: [{% for project in projects %}'{{ project.project_name }}',{% endfor %}],
                     title: {
                       text: "Completion Progress (%)", // X-axis title
                       style: {

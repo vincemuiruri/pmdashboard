@@ -8,7 +8,10 @@ from django.contrib.auth.models import User
 from . models import Project, Contractor, ProjectProgress, ProjectPhase
 from . import utils
 from django.core.paginator import Paginator
-
+from django.db.models.functions import Concat
+from django.db.models import Count, Q, F, DateTimeField, ExpressionWrapper, Func, Value, CharField
+from django.utils.timezone import localtime
+from django.db import IntegrityError
 
 # Home page view
 def index(request):
@@ -54,6 +57,8 @@ def add_new_form(request):
         except json.JSONDecodeError:
             print("Error: Invalid JSON format")
             return JsonResponse({'status': 400, 'message': 'Invalid JSON format'}, status=400)
+        except IntegrityError as e:
+            return JsonResponse({'status': 402, 'message': 'Phase already exists!'}, status=402)
         except Exception as e:
             print(f"Error: {e}")
             return JsonResponse({'status': 500, 'message': f'Error parsing request: {e}'}, status=500)
@@ -69,7 +74,12 @@ def add_new_form(request):
                 "project_id": project.projectID
             })
 
-    return render(request, 'addnewform.html', {"projects": projects, "user": user, "is_admin": is_admin})
+    notification_list = []
+    status, response = get_notifications()
+    if status:
+        notification_list = response
+
+    return render(request, 'addnewform.html', {"projects": projects, "user": user, "is_admin": is_admin, "notifications": notification_list})
 
 @login_required(login_url="/auth/login")
 def contrators_form(request):
@@ -153,6 +163,7 @@ def dashboard_view(request):
 
     # get all projects then paginate
     project_list = []
+    project_progress = []
     try:
         projects = get_all_projects()
 
@@ -162,11 +173,24 @@ def dashboard_view(request):
         project_pg = Paginator(sorted_projects, 8 if page_number == "1" else 5)
         project_batch = project_pg.get_page(page_number)
         project_list = project_batch.object_list
+        project_progress = [
+            progress["status"] for progress in project_list
+        ]
     except Exception as e:
         print(f"Error: {e}")
 
     #print(f"Project: {project_list}")
-    return render(request, 'dashboard.html', {"user": user, "is_admin": is_user_admin, "projects": project_list})
+    notification_list = []
+    status, response = get_notifications()
+    if status:
+        notification_list = response
+    return render(request, 'dashboard.html', {
+        "user": user, 
+        "is_admin": is_user_admin, 
+        "projects": project_list,
+        "progress_list": project_progress,
+        "notifications": notification_list
+        })
     
     
 
@@ -179,8 +203,12 @@ def table_data_view(request):
         return HttpResponseForbidden("Not allowed to view this page.")
 
     projects = get_all_projects()
+    notification_list = []
+    status, response = get_notifications()
+    if status:
+        notification_list = response
 
-    return render(request, 'tables-data.html', {"projects": projects, "is_admin": is_admin, "user": user})
+    return render(request, 'tables-data.html', {"projects": projects, "is_admin": is_admin, "user": user, "notifications": notification_list})
 
 def get_all_projects():
     projects = []
@@ -365,3 +393,40 @@ def signup(request):
 def logout_request(request):
     logout(request)
     return  redirect("/")
+
+
+def get_notifications():
+    try:
+        project_progress = ProjectProgress.objects.select_related("project").filter(is_read=False)
+        if not project_progress:
+            print("No new notifications")
+            return False, {
+                "message": "No new messages",
+                "status": 200
+            }
+        unread_progress_project = [
+            project for project in project_progress if len(project.comment) > 0
+        ]
+        projects = [
+            project.project for project in unread_progress_project
+        ]
+        contractors = Contractor.objects.filter(project__in=projects)
+
+        unread_messages = [
+            {
+                "message": progress.comment,
+                "contractor":  (contractors.filter(project=progress.project).annotate(full_name=Concat("first_name",Value(" "),"last_name"))
+                                .values("full_name").first()).get("full_name"),
+                "image": progress.image,
+                "date": str(localtime(progress.date).strftime("%b %d at %H:%m"))
+            } for progress in unread_progress_project
+        ]
+        # print(f"Unread messages: {unread_messages}")
+        return True, unread_messages
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return False, {
+            "message": "Something went wrong.",
+            "status": 500
+        }

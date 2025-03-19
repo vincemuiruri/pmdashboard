@@ -15,7 +15,8 @@ $(document).ready(function () {
 
         // Check if required fields are filled
         if (!projectId || !phaseNumber || !comment) {
-            alert("All fields are required.");
+            document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">All fields are required.</div>`;
+            showModal();
             return;
         }
 
@@ -25,12 +26,14 @@ $(document).ready(function () {
             const maxSize = 5 * 1024 * 1024; // 5MB
 
             if (!allowedExtensions.includes(imageInput.type)) {
-                alert("Invalid file format. Only JPEG, JPG, and PNG are allowed.");
+                document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">Invalid file format. Only JPEG, JPG, and PNG are allowed.</div>`;
+                showModal();
                 return;
             }
 
             if (imageInput.size > maxSize) {
-                alert("Image size must not exceed 5MB.");
+                document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">Image size must not exceed 5MB.</div>`;
+                showModal();
                 return;
             }
         }
@@ -59,14 +62,17 @@ $(document).ready(function () {
             const message = data.message;
 
             if (status === 201) {
-                alert("Project progress updated successfully!");
+                document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-success" roler="alert">Project progress updated successfully!</div>`;
+                showModal();
                 window.location.reload();
             } else {
-                alert(message);
+                document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">${message}</div>`;
+                showModal();
             }
         })
         .catch(error => {
-            alert("Something went wrong!");
+            document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">Error: ${error}</div>`;
+            showModal();
             console.error(error);
         });
     });
