@@ -64,7 +64,7 @@ $(document).ready(function () {
             if (status === 201) {
                 document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-success" roler="alert">Project progress updated successfully!</div>`;
                 showModal();
-                window.location.reload();
+                // window.location.reload();
             } else {
                 document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">${message}</div>`;
                 showModal();
