@@ -460,3 +460,46 @@ def get_notifications():
             "message": "Something went wrong.",
             "status": 500
         }
+    
+@login_required(login_url="/auth/login")
+def change_password_view(request):
+    r_user = request.user
+    username = r_user.username
+
+    if request.method == "GET":
+        return JsonResponse({
+            "message": "Method not allowed",
+            "status":400
+        }, status=400)
+    current_p = request.POST.get("currentPassword", None)
+    new_pasword =  request.POST.get("newPassword", None)
+
+    if not(current_p and new_pasword):
+        return JsonResponse({
+            "message": "All fields required",
+            "status": 400
+        }, status=400)
+    
+    try:
+        user = authenticate(request=request, username=username, password=current_p)
+        if not user:
+            return JsonResponse({
+                "message": "Incorrect current password.",
+                "status": 401
+            }, status=401)
+        
+        user.set_password(new_pasword)
+
+        user.save()
+        return JsonResponse({
+            "message": "Password changed successfully!",
+            "status": 200
+        }, status=200)
+    
+    except Exception as e:
+        print(f"Error: {e}")
+        return JsonResponse({
+            "message": f"Error: {e}",
+            "status": 500
+        }, status=500)
+    
