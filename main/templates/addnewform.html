@@ -62,14 +62,18 @@
               </div>
               
         
-            <script>
+              <script>
                 function showSpinner() {
-                    document.getElementById("spinner").classList.remove("d-none");
-                }
-                function hideSpinner() {
-                    document.getElementById("spinner").classList.add("d-none");
+                    let spinner = document.getElementById("spinner");
+                    spinner.classList.remove("d-none");
+            
+                    // Hide spinner after 3 seconds
+                    setTimeout(() => {
+                        spinner.classList.add("d-none");
+                    }, 3000);
                 }
             </script>
+            
               </div>
 
                 

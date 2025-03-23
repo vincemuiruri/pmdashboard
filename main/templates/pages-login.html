@@ -99,9 +99,7 @@
                     </div>
                     </div>
                     <script>
-                      // Restrict deadline to future dates
-                      
-                      // Real-time Validation
+                     
                       document.addEventListener("DOMContentLoaded", function () {
                         const form = document.getElementById("login-form");
   
@@ -125,26 +123,36 @@
                         });
                       });
   
-                      function showSpinner() {
-                        document.getElementById("spinner").classList.remove("d-none");
-                        document.getElementById("submitBtn").disabled = true;
-                      }
+                      // function showSpinner() {
+                      //   document.getElementById("spinner").classList.remove("d-none");
+                      //   document.getElementById("submitBtn").disabled = true;
+                      // }
   
-                      function hideSpinner() {
-                        document.getElementById("spinner").classList.add("d-none");
-                        document.getElementById("submitBtn").disabled = false;
-                      }
+                      // function hideSpinner() {
+                      //   document.getElementById("spinner").classList.add("d-none");
+                      //   document.getElementById("submitBtn").disabled = false;
+                      // }
                       
-                    </script>
+                function showSpinner() {
+                    let spinner = document.getElementById("spinner");
+                    spinner.classList.remove("d-none");
+            
+                    // Hide spinner after 3 seconds
+                    setTimeout(() => {
+                        spinner.classList.add("d-none");
+                    }, 3000);
+                }
+               </script>
+                    
               
-                    <script>
+                    <!-- <script>
                       function showSpinner() {
                           document.getElementById("spinner").classList.remove("d-none");
                       }
                       function hideSpinner() {
                           document.getElementById("spinner").classList.add("d-none");
                       }
-                  </script>
+                  </script> -->
                                 
                   </form>
 
