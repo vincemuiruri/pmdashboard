@@ -53,6 +53,7 @@ class ProjectProgress(models.Model):
     comment = models.TextField()
     is_read = models.BooleanField(default=False)
     image = models.ImageField(upload_to='project_progress_images/', null=True, blank=True)
+    file = models.FileField(upload_to='project_progress_files/', null=True, blank=True, default=None)
 
     class Meta:
         unique_together = ("project", "phase")

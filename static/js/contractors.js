@@ -22,7 +22,8 @@ $(document).ready(function () {
 
         // Validate image (if uploaded)
         if (imageInput) {
-            const allowedExtensions = ["image/jpeg", "image/png", "image/jpg"];
+            const allowedExtensions = ["image/jpeg", "image/png", "image/jpg", "application/pdf"];
+
             const maxSize = 5 * 1024 * 1024; // 5MB
 
             if (!allowedExtensions.includes(imageInput.type)) {

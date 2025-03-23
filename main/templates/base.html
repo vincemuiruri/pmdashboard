@@ -146,29 +146,65 @@
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
             <li class="dropdown-header">
               You have {{ notifications|length }} new messages
-              <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
+              <!-- <a href="#"><span class="">l</span></a> -->
+              <button class="badge rounded-pill bg-primary p-2 ms-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+                View all
+              </button>
             </li>
-            {% for notification in notifications %}
+            {% if notifications|length > 0 %}
             <li>
               <hr class="dropdown-divider">
             </li>
 
             <li class="message-item">
               <a href="#">
-                  <img src="{% static 'assets/img/messages-1.jpg' %}" alt="" class="rounded-circle">
-                <div>
-                  <h4>{{ notification.contractor }}</h4>
-                  <p>{{ notification.message }}</p>
-                  <p><img class="img_fluid" src="/media/{{ notification.image }}"></p>
-                  <p class="small text-muted">{{ notification.date }}</p>
+                  <img src="{% static 'assets/img/ic_user_1.svg' %}" alt="" class="rounded-circle">
+                <div onclick="showNotification({
+                  'contractor': '{{ notifications.0.contractor }}',
+                  'message': '{{ notifications.0.message }}',
+                  'image': '{{ notifications.0.image }}',
+                  'date': '{{ notifications.0.date }}',
+                  'pdf': '{{ notifications.0.pdf }}'
+                })">
+                  <h4>{{ notifications.0.contractor }}</h4>
+                  <p>{{ notifications.0.message }}</p>
+                  {% if notifications.0.image %}
+                  <p><img class="img_fluid" src="/media/{{ notifications.0.image }}"></p>
+                  {% endif %}
+                  <p class="small text-muted">{{ notifications.0.date }}</p>
                 </div>
               </a>
             </li>
-            {% endfor %}
-
-            <li class="dropdown-footer">
-              <a href="#">Show all messages</a>
+            {% endif %}
+            {% if notifications|length > 1 %}
+            <li>
+              <hr class="dropdown-divider">
             </li>
+
+            <li class="message-item">
+              <a href="#">
+                  <img src="{% static 'assets/img/ic_user_1.svg' %}" alt="" class="rounded-circle">
+                <div onclick="showNotification({
+                  'contractor': '{{ notifications.1.contractor }}',
+                  'message': '{{ notifications.1.message }}',
+                  'image': '{{ notifications.1.image }}',
+                  'date': '{{ notifications.1.date }}',
+                  'pdf': '{{ notifications.1.pdf }}'
+                })">
+                  <h4>{{ notifications.1.contractor }}</h4>
+                  <p>{{ notifications.1.message }}</p>
+                  {% if notifications.1.image %}
+                  <p><img class="img_fluid" src="/media/{{ notifications.1.image }}"></p>
+                  {% endif %}
+                  <p class="small text-muted">{{ notifications.1.date }}</p>
+                </div>
+              </a>
+            </li>
+            {% endif %}
+
+            <!-- <li class="dropdown-footer">
+              <a href="#">Show all messages</a>
+            </li> -->
 
           </ul><!-- End Messages Dropdown Items -->
 
@@ -178,7 +214,7 @@
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="{% static 'assets/img/profile-img.jpg' %}" alt="Profile" class="rounded-circle">
+            <img src="{% static 'assets/img/ic_user_1.svg' %}" alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block dropdown-toggle ps-2">{{ user.first_name }}</span>
           </a><!-- End Profile Iamge Icon -->
 
@@ -333,7 +369,51 @@
       &copy; Copyright <strong><span>2025</span></strong>. All Rights Reserved
     </div>
    
+
+
+
     
+    
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasExampleLabel">Messages</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <div>
+          <ul class="list-group">
+            <li class="list-group-item">
+              <div>You have {{ notifications|length }} unread messages.</div>
+            </li>
+            {% for notification in notifications %}
+
+            <li class="message-item d-flex flex-row align-items-center list-group-item" onclick="showNotification({
+              'contractor': '{{ notification.contractor }}',
+              'message': '{{ notification.message }}',
+              'image': '{{ notification.image }}',
+              'date': '{{ notifications.date }}',
+              'pdf': '{{ notification.pdf }}'
+            })">
+                <img src="{% static 'assets/img/ic_user_1.svg' %}" width="45px" height="45px" alt="" class="rounded-circle">
+                <div class="ms-2">
+                  {{ notification.contractor }}
+                </div>
+            </li>
+            {% empty %}
+            <li class="list-group-item">
+              <div>No new messages</div>
+            </li>
+            {% endfor %}
+            
+          </ul>
+          
+        </div>
+        
+      </div>
+    </div>
+
+
+
   </footer><!-- End Footer -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
@@ -343,6 +423,22 @@
     function showModal() {
         var reportModal = new bootstrap.Modal(document.getElementById("general_modal"));
         reportModal.show();
+      }
+
+      showNotification = function (message ={}) {
+        const img_file = message.image != null && message.image.length > 0 ? `Image: <img src="/media/${message.image}" class="img_fluid" style='max-width: 250px;'>` : 'No Image';
+        const pdf_file = message.pdf != null && message.pdf.length > 0  ? `<a href="/media/${message.pdf}" target="_blank">View PDF</a>` : 'No Document';
+        const modal_html = `
+        <div class='d-flex flex-column'>
+          <p><span class='fw-bold'>Contractor:</span> ${message.contractor}</p>
+          <p><span class='fw-bold'>Message:</span> ${message.message}</p>
+          <p><span class='fw-bold'>Date:</span> ${message.date}</p>
+          <p class='d-flex flex-column'><span class='fw-bold'>Files:</span> <span>${img_file}</span><span>${pdf_file}</span></p>
+        </div>
+        `;
+        $('#general_modal_body').html(modal_html);
+
+        showModal();
       }
    </script>
   <script src="{% static 'assets/vendor/apexcharts/apexcharts.min.js' %}"></script>

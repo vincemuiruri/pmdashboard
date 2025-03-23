@@ -12,6 +12,7 @@ from django.db.models.functions import Concat
 from django.db.models import Count, Q, F, DateTimeField, ExpressionWrapper, Func, Value, CharField
 from django.utils.timezone import localtime
 from django.db import IntegrityError
+import mimetypes
 
 # Home page view
 def index(request):
@@ -94,7 +95,24 @@ def contrators_form(request):
             project_id = request.POST.get('project_id')
             phase_number = request.POST.get('phase_number')
             comment = request.POST.get('comment')
-            image = request.FILES.get('image')  # Get uploaded image
+            file = request.FILES.get('file', None)
+            image = None
+            file_type = "unknown"
+            if file:
+                mime_type, _ = mimetypes.guess_type(file.name)
+                
+                if mime_type:
+                    if mime_type.startswith('image/'):
+                        file_type = "image"
+                        image = file
+                    elif mime_type == 'application/pdf':
+                        file_type = "pdf"
+                    else:
+                        file_type = "unknown"
+                else:
+                    file_type = "unknown"
+
+            print(f"Uploaded file is a {file_type}")
 
             if not all([project_id, phase_number, comment]):
                 return JsonResponse({'status': 400, 'message': 'All fields required'}, status=400)
@@ -110,7 +128,8 @@ def contrators_form(request):
                 project=project,
                 phase=phase_name,
                 comment=comment,
-                image=image
+                image=image,
+                file=file if file_type == "pdf" else None
             )
 
             new_project_progress.save()
@@ -138,12 +157,19 @@ def contrators_form(request):
             project["project_id"] = cont_project.projectID
             project["project_name"] = cont_project.name
 
-            project_phases = ProjectPhase.objects.filter(project=cont_project).all()
+            # project_phases = ProjectPhase.objects.filter(project=cont_project).all()
+            project_progress = ProjectProgress.objects.select_related("phase").filter(project=cont_project).last()
+            if not project_progress:
+                next_phase = ProjectPhase.objects.filter(project=cont_project, phase_number=1).first()
 
-            for phase in project_phases:
+            else:
+                next_phase_number = project_progress.phase.phase_number + 1
+                next_phase = ProjectPhase.objects.filter(project=cont_project, phase_number=next_phase_number).first()
+
+            if next_phase:
                 phases.append({
-                    "phase_number": phase.phase_number,
-                    "phase_name": phase.name
+                    "phase_number": next_phase.phase_number,
+                    "phase_name": next_phase.name
                 })
     except Exception as e:
         print(f"Error: {e}")
@@ -167,10 +193,8 @@ def dashboard_view(request):
     try:
         projects = get_all_projects()
 
-        # Sort projects by "status" in ascending order
-        sorted_projects = sorted(projects, key=lambda x: x["status"], reverse=True)
         # Paginate the sorted list
-        project_pg = Paginator(sorted_projects, 8 if page_number == "1" else 5)
+        project_pg = Paginator(projects, 8 if page_number == "1" else 5)
         project_batch = project_pg.get_page(page_number)
         project_list = project_batch.object_list
         project_progress = [
@@ -234,7 +258,8 @@ def get_all_projects():
     except Exception as e:
         print(f"Error: {e}")
 
-    return projects
+    sorted_projects = sorted(projects, key=lambda x: x["status"], reverse=True)
+    return sorted_projects
 
 def compute_project_progress(project):
     try:
@@ -418,10 +443,15 @@ def get_notifications():
                 "contractor":  (contractors.filter(project=progress.project).annotate(full_name=Concat("first_name",Value(" "),"last_name"))
                                 .values("full_name").first()).get("full_name"),
                 "image": progress.image,
-                "date": str(localtime(progress.date).strftime("%b %d at %H:%m"))
+                "date": str(localtime(progress.date).strftime("%b %d at %H:%m")),
+                "pdf": progress.file
             } for progress in unread_progress_project
         ]
         # print(f"Unread messages: {unread_messages}")
+        if len(unread_messages) > 0:
+            sorted_message = sorted(unread_messages, key=lambda x: x["date"], reverse=True)
+            print(f"Sorted messages: {sorted_message}")
+            unread_messages = sorted_message
         return True, unread_messages
 
     except Exception as e:
