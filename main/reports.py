@@ -16,7 +16,15 @@ def generate_projects_report(request):
             "deadline": rq_deadline,
             "status": format_status
         })
-
+        # Generate caption
+        if format_status and rq_deadline:
+            caption = f"{format_status.capitalize()} Projects: By Deadline {rq_deadline}"
+        elif format_status:
+            caption = f"{format_status.capitalize()} Projects"
+        elif rq_deadline:
+            caption = f"Projects: By Deadline {rq_deadline}"
+        else:
+            caption="Projects"
         headers = [["Project", "Contractor", "Deadline", "Status"]]
 
         total = len(projects_list)
@@ -55,7 +63,7 @@ def generate_projects_report(request):
             "total": total
         }
 
-        is_generated, response = pdf.generate_report_pdf("Projects",data)
+        is_generated, response = pdf.generate_report_pdf(caption,data)
         if is_generated:
             return response
         
