@@ -548,4 +548,30 @@ def change_password_view(request):
             "message": f"Error: {e}",
             "status": 500
         }, status=500)
+
+def project_update(request):
+    id = request.GET.get("id", None)
+
+    if not id:
+        return JsonResponse({
+            "message":"No project sepecified",
+            "status":400
+        })
     
+    try:
+        project = Project.objects.get(projectID=id)
+        project.delete()
+        return JsonResponse({
+            "message":"Project deleted",
+            "status": 200
+        }, status=200)
+    except Project.DoesNotExist:
+        return JsonResponse({
+            "message":"Project does not exist",
+            "status": 404
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            "message": f"Error: {e}",
+            "status": 500
+        }, status=500)

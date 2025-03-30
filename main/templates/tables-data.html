@@ -93,7 +93,7 @@
               </thead>
               <tbody id="project_body">
                 {% for project in projects %}
-                <tr>
+                <tr onclick='showDeleteDialog("{{ project.project_id }}")'>
                   <td>{{ project.project_id }}</td>
                   <td>{{ project.contractor }}</td>
                   <td>{{ project.project_name }}</td>
@@ -154,7 +154,7 @@
           }else{
             projects.forEach(project => {
 
-            html += `<tr>
+            html += `<tr onclick='showDeleteDialog("${ project.project_id }")'>
                   <td>${ project.project_id }</td>
                   <td>${ project.contractor }</td>
                   <td>${ project.project_name }</td>
@@ -205,6 +205,37 @@
       return fullUrl;
     }
   });
-  
+  function showDeleteDialog(project_id){
+    html = `
+      <div>
+        <p>Select an action below</p>
+        <button class="btn btn-danger" onclick='deleteProject("${project_id}")'>Delete Project</button>
+      </div>`;
+
+      document.getElementById("general_modal_body").innerHTML = html;
+      showModal();
+  }
+  async function deleteProject(project_id){
+    try{
+      if(!confirm("Are you sure you want to delete this poject")){
+        return;
+      }
+      const response = await fetch(`/project/delete?id=${project_id}`,{
+        method:"GET"
+      });
+      const data = await response.json();
+
+      if (response.ok){
+        document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-success" roler="alert">${data.message}/div>`;
+        showModal();
+        location.reload()
+      }else{
+        document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">${data.message}</div>`;
+        showModal();
+      }
+    }catch(error){
+      console.log(error)
+    }
+  }
 </script>
 {% endblock %}

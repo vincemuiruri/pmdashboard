@@ -16,5 +16,6 @@ urlpatterns = [
     path("projects/report", reports.generate_projects_report, name="generate_projects_report"),
     path("user/profile", views.users_profile_view, name="user_profile"),
     path("user/profile/update", views.change_password_view, name="change_password"),
+    path("project/delete", views.project_update, name="project_delete")
 
 ]
