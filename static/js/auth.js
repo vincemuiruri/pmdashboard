@@ -69,8 +69,8 @@ $(document).ready(function(){
                     document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">${message}</div>`;
                     showModal();
                 }
-                //this.reset();
-                location.reload();
+                this.reset();
+                // location.reload();
             }).catch(error=>{
                 document.getElementById("general_modal_body").innerHTML = `<div class="alert alert-danger" roler="alert">Error: ${error}</div>`;
                 showModal();
