@@ -225,8 +225,25 @@ def table_data_view(request):
 
     if not is_admin:
         return HttpResponseForbidden("Not allowed to view this page.")
+    filter = request.GET.get("filter", None)
 
-    projects = get_all_projects()
+    rq_deadline = request.GET.get('deadline', None)
+    rq_status = request.GET.get("status", None)
+
+    available_status = ["ongoing", "completed"]
+
+    format_status = rq_status if rq_status and rq_status in available_status else None
+
+    projects = get_all_projects(qs_filters={
+        "deadline": rq_deadline,
+        "status": format_status
+    })
+
+    if filter:
+        return JsonResponse({
+            "projects": projects
+        })
+
     notification_list = []
     status, response = get_notifications()
     if status:
@@ -234,17 +251,35 @@ def table_data_view(request):
 
     return render(request, 'tables-data.html', {"projects": projects, "is_admin": is_admin, "user": user, "notifications": notification_list})
 
-def get_all_projects():
+def get_all_projects(qs_filters={}):
     projects = []
 
     try:
-        project_data = Project.objects.prefetch_related("project_contractor", "project_progress").all()
+        filters = {}
+
+        rq_status = None
+        qs_deadline =qs_filters.get("deadline", None)
+
+        if qs_deadline and qs_deadline is not None:
+            filters["deadline"] = qs_deadline
+
+        qs_status =qs_filters.get("status", None)
+
+        if qs_status and qs_status is not None:
+            rq_status = qs_status
+        
+        project_data = Project.objects.prefetch_related("project_contractor", "project_progress").filter(**filters)
 
         for project in project_data:
             
             project_contractor = project.project_contractor.first()
             status = round(compute_project_progress(project), 1)
 
+            if rq_status:
+                if rq_status == "completed" and not status >= 100:
+                    continue
+                elif rq_status == "ongoing" and not status < 100:
+                    continue
             projects.append({
                 "project_name": project.name,
                 "project_id": project.projectID,
@@ -296,6 +331,7 @@ def users_profile_view(request):
 
     contractor = None
     contractor_info = {}
+    messages = []
     try:
         if is_user_contractor:
             contractor = user.user_contractor
@@ -309,6 +345,15 @@ def users_profile_view(request):
         
         is_me = contractor.user == user
         contractor_project = contractor.project
+
+        project_progress = ProjectProgress.objects.filter(project=contractor_project).all()
+
+        messages = [
+            {
+                "message": progress.comment,
+                "date": progress.date
+            } for progress in project_progress
+        ] if project_progress.exists() else []
 
         contractor_info["first_name"] = contractor.first_name
         contractor_info["last_name"] = contractor.last_name
@@ -330,7 +375,8 @@ def users_profile_view(request):
         "is_me": is_me,
         "user": user,
         "is_contractor": is_user_contractor,
-        "is_admin": is_admin
+        "is_admin": is_admin,
+        "messages": messages
     })
 
 @csrf_exempt

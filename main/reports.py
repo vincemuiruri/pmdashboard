@@ -4,7 +4,18 @@ from django.http import JsonResponse
 
 def generate_projects_report(request):
     try:
-        projects_list = views.get_all_projects()
+
+        rq_deadline = request.GET.get('deadline', None)
+        rq_status = request.GET.get("status", None)
+
+        available_status = ["ongoing", "completed"]
+
+        format_status = rq_status if rq_status and rq_status in available_status else None
+
+        projects_list = views.get_all_projects(qs_filters={
+            "deadline": rq_deadline,
+            "status": format_status
+        })
 
         headers = [["Project", "Contractor", "Deadline", "Status"]]
 

@@ -97,10 +97,20 @@
               <div class="progress-bar" role="progressbar" style="width: {{ contractor.project.status }}%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{ contractor.project.status }}%</div>
             </div>
             
-           
-
-          </div>
+            
+            </div>
+            
         </div>
+        <ul>
+          <div>
+            <p>Comments</p>
+          </div>
+            {% for message in messages %}
+            <li>{{ message.message }}</li>
+            {% empty %}
+            <div class="">No comments</div>
+            {% endfor %}
+        </ul>
               </div>
 
               <div class="tab-pane fade profile-edit pt-3" id="profile-edit">

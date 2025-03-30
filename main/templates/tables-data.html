@@ -22,11 +22,27 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">ALL PROJECTS</h5>
-            <button type="button" class="btn btn-primary" onclick="window.open('/projects/report', '_blank')">Download PDF</button>
+            <div class="filters d-flex flex-row justify-content-center w-100 align-items-center">
+              <div class="form-group">
+                <label for="input-deadline">Select deadline</label>
+                <input type="date" class="form-control" name="input-deadline" id="input-deadline">
+              </div>
+              <div class="form-group">
+                <label for="input-status">Select status</label>
+                <select  class="form-control" name="input-status" id="input-status">
+                  <option value="all">All</option>
+                  <option value="completed">Completed</option>
+                  <option value="ongoing">Ongoing</option>
+                </select>
+              </div>
+              <button type="button" class="btn btn-primary" id="btn-filter-project">Apply</button>
+              <button type="button" class="btn btn-primary" id="btn_download">Download PDF</button>
+
+            </div>
             <!-- <p>Add lightweight datatables to your project with using the <a href="https://github.com/fiduswriter/Simple-DataTables" target="_blank">Simple DataTables</a> library. Just add <code>.datatable</code> class name to any table you wish to conver to a datatable. Check for <a href="https://fiduswriter.github.io/simple-datatables/demos/" target="_blank">more examples</a>.</p> -->
 
             <!-- Table with stripped rows -->
-            <table class="table datatable">
+            <table class="table ">
               <thead>
                 <tr>
                   <th>
@@ -38,7 +54,7 @@
                   <th>Status</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="project_body">
                 {% for project in projects %}
                 <tr>
                   <td>{{ project.project_id }}</td>
@@ -60,4 +76,98 @@
   </section>
 
 </main>
+<script>
+  $(document).ready(function(){
+    $("#btn_download").click(function(){
+      const url = buildUrl("/projects/report");
+      console.log(url)
+      if(!url){
+        console.log("Empty url");
+      }
+
+      window.open(url, "_blank");
+    })
+    $("#btn-filter-project").click(async function(){
+      const url = buildUrl("/projects/view");
+      console.log(url)
+      if(!url){
+        console.log("Empty url");
+      }
+
+      var project_body = $("#project_body");
+      try{
+        project_body.html(`
+        <div class="d-flex justify-content-center align-items-center">   
+          <div id="spinner" class="spinner-border text-primary d-none ms-3" role="status">
+              <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>`)
+        const response = await fetch(`${url}&filter=true`, {
+          method: "GET"
+        });
+
+        const data = await response.json();
+
+        if(response.ok){
+          project_body.html("");
+          const projects = data.projects;
+          let html =  "";
+          if(projects.length == 0){
+            html += `<tr><td colspan="5">No projects available</td></td>`;
+          }else{
+            projects.forEach(project => {
+
+            html += `<tr>
+                  <td>${ project.project_id }</td>
+                  <td>${ project.contractor }</td>
+                  <td>${ project.project_name }</td>
+                  <td>${ project.deadline }</td>
+                  <td>${ project.status }%</td>
+                </tr>`;
+          });
+          }
+          
+          if(project_body){
+            console.log("Project body available");
+            project_body.html(html);
+          }else{
+            console.log("Project body not avaialble");
+          }
+        }else{
+          project_body.html(data.error || "Something went wrong");
+          alert(data.error || "Something went wrong");
+        }
+
+      }catch(error){
+        project_body.html("Error occured while filtering projects.")
+        alert("Error occured while filtering projects.")
+        console.log(error)
+      }
+      
+    });
+    function buildUrl(url){
+      const deadline = $("#input-deadline").val();
+      const status = $("#input-status").val();
+      let queryParams = [];
+
+      if (deadline && deadline.length > 0) {
+          queryParams.push(`deadline=${encodeURIComponent(deadline)}`);
+      }
+      if (status && status.length > 0) {
+          queryParams.push(`status=${encodeURIComponent(status)}`);
+      }
+
+      if (queryParams.length === 0) {
+          console.log('No filters selected');
+          return;
+      }
+
+      let fullUrl = url + "?" + queryParams.join("&");
+      console.log(fullUrl);  // Output the final URL
+
+      return fullUrl;
+    }
+  });
+  
+</script>
 {% endblock %}
